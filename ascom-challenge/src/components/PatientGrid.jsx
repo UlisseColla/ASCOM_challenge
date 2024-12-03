@@ -21,9 +21,11 @@ const PatientGrid = () => {
   const fetchPatients = async () => {
     try {
       const response = await getPatients();
-    //   console.log('Patient Data:', response.data);
+      // console.log('Birth date from API:', response.data[0].birthDate);
+      setPatients(response.data);
+      
       console.log('Before setting patients:', response.data);
-      setPatients(Array.isArray(response.data) ? response.data : []);
+      // setPatients(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error('Error fetching patients:', error);
     } finally {
@@ -35,12 +37,36 @@ const PatientGrid = () => {
     { field: 'familyName', headerName: 'Family Name', width: 130 },
     { field: 'givenName', headerName: 'Given Name', width: 130 },
     { field: 'sex', headerName: 'Sex', width: 90 },
-    { field: 'birthDate', headerName: 'Birth Date', width: 130 },
+    { 
+      field: 'birthDate',
+      headerName: 'Birth Date',
+      width: 130,
+      /* valueFormatter: (params) => new Date(params.value).toLocaleDateString() */
+      renderCell: (params) => {
+        const [date] = params.row.birthDate.split('T');
+        const [year, month, day] = date.split('-');
+        return `${day}/${month}/${year}`;
+      }
+     },
     { 
       field: 'paramCount', 
       headerName: 'Parameters', 
       width: 100,
-      valueGetter: (params) => params?.row?.parameters?.length || 0
+      renderCell: (params) => params.row.parameters.length
+      /* valueGetter: (params) => {
+        // console.log('Params:', params); // Log the params
+        // console.log('Parameters:', params?.row?.parameters); // Log parameters
+        return params?.row?.parameters?.length || 0;
+      } */
+    },
+    {
+      field: 'hasAlarm',
+      headerName: 'Alarm',
+      width: 100,
+      renderCell: (params) => {
+        const hasAlarm = params.row.parameters.some(param => param.alarm);
+        return hasAlarm ? <ErrorIcon color="error" /> : null;
+      }
     }
   ];
 
@@ -101,12 +127,12 @@ const PatientGrid = () => {
     }
   ]; */
 
-  const handleRowClick = (params) => {
+  /* const handleRowClick = (params) => {
     setSelectedPatient(params.row);
     setDialogOpen(true);
-  };
+  }; */
 
-  console.log('Patients state:', patients);
+  // console.log('Patients state:', patients);
 
   return (
     <div style={{ height: 600, width: '100%' }}>
