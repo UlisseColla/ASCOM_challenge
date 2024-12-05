@@ -1,47 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  DataGrid,
-  GridToolbar 
-} from '@mui/x-data-grid';
-import { getPatients } from '../services/api';
+import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import ErrorIcon from '@mui/icons-material/Error';
 import { format } from 'date-fns';
-// import PatientDialog from './PatientDialog';
+//import { getPatients } from '../services/api'; // Import the getPatients function from the api.js file in case of call to the API to fetch the patients
 
 const PatientGrid = () => {
   const [patients, setPatients] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedPatient, setSelectedPatient] = useState(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    const fetchPatients = async () => {
+      try {
+        // const response = await getPatients(); // In case of call to the API to fetch the patients decomment this line and comment the two lines below
+        const response = await fetch('/patients.json');
+        const data = await response.json();
+        setPatients(data); // In case of call to the API to fetch the patients change to setPatients(response.data);
+      } catch (error) {
+        console.error('Error fetching patients:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
     fetchPatients();
   }, []);
 
-  const fetchPatients = async () => {
-    try {
-      const response = await getPatients();
-      // console.log('Birth date from API:', response.data[0].birthDate);
-      setPatients(response.data);
-      
-      console.log('Before setting patients:', response.data);
-      // setPatients(Array.isArray(response.data) ? response.data : []);
-    } catch (error) {
-      console.error('Error fetching patients:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const columns = [
-    { field: 'familyName', headerName: 'Family Name', width: 130 },
+    { field: 'familyName', headerName: 'Family Name', headerClassName: 'column-header', width: 130 },
     { field: 'givenName', headerName: 'Given Name', width: 130 },
     { field: 'sex', headerName: 'Sex', width: 90 },
     { 
       field: 'birthDate',
       headerName: 'Birth Date',
       width: 130,
-      /* valueFormatter: (params) => new Date(params.value).toLocaleDateString() */
       renderCell: (params) => {
         const [date] = params.row.birthDate.split('T');
         const [year, month, day] = date.split('-');
@@ -53,11 +44,6 @@ const PatientGrid = () => {
       headerName: 'Parameters', 
       width: 100,
       renderCell: (params) => params.row.parameters.length
-      /* valueGetter: (params) => {
-        // console.log('Params:', params); // Log the params
-        // console.log('Parameters:', params?.row?.parameters); // Log parameters
-        return params?.row?.parameters?.length || 0;
-      } */
     },
     {
       field: 'hasAlarm',
@@ -70,70 +56,30 @@ const PatientGrid = () => {
     }
   ];
 
-  /* const columns = [
-    { field: 'familyName', headerName: 'Family Name', flex: 1 },
-    { field: 'givenName', headerName: 'Given Name', flex: 1 },
-    { field: 'sex', headerName: 'Sex', width: 100 },
-    { 
-      field: 'birthDate', 
-      headerName: 'Birth Date', 
-      flex: 1,
-      valueFormatter: (params) => {
-        if (!params.value) return '';
-        return new Date(params.value).toLocaleDateString();
-      }
-    },
-    {
-      field: 'parameterCount',
-      headerName: 'Parameters',
-      width: 120,
-      valueGetter: (params) => params.row?.parameters?.length || 0
-    },
-    {
-      field: 'alarm',
-      headerName: 'Alarm',
-      width: 100,
-      renderCell: (params) => {
-        const hasAlarm = params.row?.parameters?.some(param => param.alarm);
-        return hasAlarm ? <ErrorIcon color="error" /> : null;
-      }
-    }
-  ]; */
+// Map the original API data to add a uniqueId to each patient and to remove duplicates, in case of call to the API to fetch the patients
+/* const uniquePatients = patients.map((patient, index, array) => {
 
-  /* const columns = [
-    { field: 'familyName', headerName: 'Family Name', flex: 1 },
-    { field: 'givenName', headerName: 'Given Name', flex: 1 },
-    { field: 'sex', headerName: 'Sex', width: 100 },
-    {
-      field: 'birthDate', 
-      headerName: 'Birth Date', 
-      flex: 1,
-      valueFormatter: (params) => format(new Date(params.value), 'dd/MM/yyyy')
-    },
-    {
-      field: 'parameters',
-      headerName: 'Parameters',
-      width: 120,
-      valueGetter: (params) => params.row.parameters.length
-    },
-    {
-      field: 'hasAlarm',
-      headerName: 'Alarm',
-      width: 100,
-      renderCell: (params) => {
-        const hasAlarm = params.row.parameters.some(param => param.alarm);
-        return hasAlarm ? <ErrorIcon color="error" /> : null;
-      }
-    }
-  ]; */
+  const isDuplicate = array.some((p, earlierIndex) => 
+    earlierIndex < index &&
+    p.id === patient.id );
+  
+  const uniqueId = isDuplicate ? index + 1000 : patient.id;
+  return { ...patient, uniqueId };
+})
+.filter((patient, index, array) => {
 
-  /* const handleRowClick = (params) => {
-    setSelectedPatient(params.row);
-    setDialogOpen(true);
-  }; */
+  const isDuplicate = array.some((p, earlierIndex) => 
+      earlierIndex < index &&
+      p.familyName === patient.familyName &&
+      p.givenName === patient.givenName &&
+      p.sex === patient.sex &&
+      p.birthDate === patient.birthDate
+  );
+  
+  return !isDuplicate;
+}); */
 
-  // console.log('Patients state:', patients);
-
+/* If using uniquePatients, then instead of 'patients' use 'uniquePatients', and 'row.id' becomes 'row.uniqueId' */
   return (
     <div style={{ height: 600, width: '100%' }}>
     {patients.length > 0 && (
@@ -149,20 +95,3 @@ const PatientGrid = () => {
 };
 
 export default PatientGrid;
-
-/* <DataGrid
-rows={patients}
-columns={columns}
-loading={loading}
-components={{ Toolbar: GridToolbar }}
-onRowClick={handleRowClick}
-getRowId={(row) => row.id}
-/> */
-/* {selectedPatient && (
-<PatientDialog
-    open={dialogOpen}
-    patient={selectedPatient}
-    onClose={() => setDialogOpen(false)}
-    onUpdate={fetchPatients}
-/>
-)} */
