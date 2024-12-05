@@ -26,7 +26,7 @@ const PatientGrid = () => {
   }, []);
 
   const columns = [
-    { field: 'familyName', headerName: 'Family Name', headerClassName: 'column-header', width: 130 },
+    { field: 'familyName', headerName: 'Family Name', width: 130 },
     { field: 'givenName', headerName: 'Given Name', width: 130 },
     { field: 'sex', headerName: 'Sex', width: 90 },
     { 
