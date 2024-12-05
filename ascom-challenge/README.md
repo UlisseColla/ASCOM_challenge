@@ -1,8 +1,15 @@
-# React + Vite
+# ASCOM challenge
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Once you cloned the project, enter the repository and install the node modules.
+``` bash
+cd ASCOM_challenge/ascom_challenge/
+npm install
+```
 
-Currently, two official plugins are available:
+Then run: 
+``` bash
+npm run dev
+```
+to run it locally on your browser.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+The App fetches the data from the patients.JSON which is in the root of the repository. If you want to test the API call to 
