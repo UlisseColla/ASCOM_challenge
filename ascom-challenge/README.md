@@ -12,4 +12,6 @@ npm run dev
 ```
 to run it locally on your browser.
 
-The App fetches the data from the patients.JSON which is in the root of the repository. If you want to test the API call to 
+The App fetches the data from the patients.JSON which is in the root of the repository. If you want to test the API call to get the data from https://mobile.digistat.it/CandidateApi/ then follow the instructions I left in the comments in PatientsGrid.jsx.
+
+In case you need any explanation or help do not hesitate to contact me at colla.ulisse@gmail.com.
